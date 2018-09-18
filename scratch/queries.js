@@ -58,33 +58,53 @@ const Note = require('../models/note');
 
 
 
+// mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
+//   .then(() => {
+
+//     const newObj = {
+//         title: 'New Note',
+//         content: 'Some Content'
+//     }
+
+//     if (!newObj.title || !newObj.content) {
+//       console.log('Must input Title and Content');
+//     }
+
+//     return Note.create(newObj);
+//   })
+//   .then(results => {
+//     console.log(results);
+//   })
+//   .then(() => {
+//     return mongoose.disconnect()
+//   })
+//   .catch(err => {
+//     console.error(`ERROR: ${err.message}`);
+//     console.error(err);
+//   });
+
+  
 mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
-  .then(() => {
-    const newObj = {
-        title: 'New Note',
-        content: 'Some Content'
-    }
+.then(() => {
 
-    if (!newObj.title || !newObj.content) {
-      console.log('Must input Title and Content');
-    }
+  const newObj = {
+      title: 'New Note',
+      content: 'Some Content'
+  }
 
-    return Note.create(newObj, (err, user) => {
-        if(err) {
-            console.log('not enough data');
-        }
-        else {
-            return user;
-        }
-    });
-  })
-  .then(results => {
-    console.log(results);
-  })
-  .then(() => {
-    return mongoose.disconnect()
-  })
-  .catch(err => {
-    console.error(`ERROR: ${err.message}`);
-    console.error(err);
-  });
+  if (!newObj.title && !newObj.content) {
+    console.log('Must input Title and Content');
+  }
+
+  return Note.findByIdAndUpdate(newObj);
+})
+.then(results => {
+  console.log(results);
+})
+.then(() => {
+  return mongoose.disconnect()
+})
+.catch(err => {
+  console.error(`ERROR: ${err.message}`);
+  console.error(err);
+});
