@@ -84,27 +84,49 @@ const Note = require('../models/note');
 //   });
 
   
-mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
-.then(() => {
+// mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
+// .then(() => {
 
-  const newObj = {
-      title: 'New Note',
-      content: 'Some Content'
-  }
 
-  if (!newObj.title && !newObj.content) {
-    console.log('Must input Title and Content');
-  }
+//   const id = '000000000000000000000002';  
+//   const newObj = {
+//       title: 'New Note',
+//       content: 'Some Content'
+//   }
 
-  return Note.findByIdAndUpdate(newObj);
-})
-.then(results => {
-  console.log(results);
-})
-.then(() => {
-  return mongoose.disconnect()
-})
-.catch(err => {
-  console.error(`ERROR: ${err.message}`);
-  console.error(err);
-});
+//   if (!newObj.title && !newObj.content) {
+//     console.log('Must input Title and Content');
+//   }
+
+//   return Note.findByIdAndUpdate(id, newObj);
+// })
+// .then(results => {
+//   console.log(results);
+// })
+// .then(() => {
+//   return mongoose.disconnect()
+// })
+// .catch(err => {
+//   console.error(`ERROR: ${err.message}`);
+//   console.error(err);
+// });
+
+
+
+// mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
+// .then(() => {
+
+//   const id = '000000000000000000000002';  
+
+//   return Note.findByIdAndRemove(id);
+// })
+// .then(results => {
+//   console.log(results);
+// })
+// .then(() => {
+//   return mongoose.disconnect()
+// })
+// .catch(err => {
+//   console.error(`ERROR: ${err.message}`);
+//   console.error(err);
+// });
