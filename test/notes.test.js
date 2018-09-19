@@ -137,8 +137,8 @@ describe("Notes API Resource", function() {
 
     it('should update fields you send over', function() {
       const updateData = {
-        title: 'fofofofofofofof',
-        content: 'futuristic fusion'
+        title: 'sadfasdg',
+        content: 'hello'
       };
 
       return Note
