@@ -2,41 +2,30 @@
 
 const express = require("express");
 const Note = require("../models/note");
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get("/", (req, res, next) => {
   let searchTerm = req.query.searchTerm;
+  let folderId = req.query.folderId;
+  let filter = {};
 
   if (searchTerm) {
-    return Note.find({
-      $or: [
-        { title: { $regex: searchTerm, $options: "i" } },
-        { content: { $regex: searchTerm, $options: "gi" } }
-      ]
+    const search = new RegExp(searchTerm, "i");
+    filter.title = { $regex: search };
+  }
+  if (folderId) {
+    filter.folderId = folderId;
+  }
+  Note.find(filter) 
+    .then(results => {
+      res.json(results);
     })
-
-      .then(results => {
-        res.json(results);
-      })
-
-      .catch(err => {
-        console.error(`ERROR: ${err.message}`);
-        console.error(err);
-      });
-  }
-  if (!searchTerm) {
-    return Note.find()
-
-      .then(results => {
-        res.json(results);
-      })
-      .catch(err => {
-        console.error(`ERROR: ${err.message}`);
-        console.error(err);
-      });
-  }
+    .catch(err => {
+      next(err);
+    });
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
@@ -72,17 +61,24 @@ router.get("/:id", (req, res, next) => {
 router.post("/", (req, res, next) => {
   const newObj = {
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    folderId: req.body.folderId
   };
 
   if (!newObj.title || !newObj.content) {
     console.log("Must input Title and Content");
   }
 
+  // if (!mongoose.Types.ObjectId.isValid(newObj.folderId)) {
+  //   const err = new Error("The `id` is not valid");
+  //   err.status = 400;
+  //   return next(err);
+  // }
+
   return Note.create(newObj)
 
     .then(results => {
-      res.location(`${req.originalUrl}/${results.id}`)
+      res.location(`${req.originalUrl}/${results.id}`);
       res.status(201).json(results);
     })
 
@@ -95,9 +91,11 @@ router.post("/", (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put("/:id", (req, res, next) => {
   const id = req.params.id;
+  const folderId = req.body.folderId;
   const newObj = {
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    folderId
   };
 
   return Note.findByIdAndUpdate(id, newObj, { new: true })

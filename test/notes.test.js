@@ -18,7 +18,7 @@ describe("Notes API Resource", function() {
   before(function() {
     return mongoose
       .connect(TEST_MONGODB_URI)
-      .then(() => mongoose.connection.db.dropDatabase());
+
   });
 
   beforeEach(function() {
@@ -77,10 +77,11 @@ describe("Notes API Resource", function() {
             "id",
             "title",
             "content",
+            "folderId",
             "createdAt",
             "updatedAt"
           );
-
+      
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
