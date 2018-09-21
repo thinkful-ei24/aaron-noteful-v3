@@ -86,6 +86,8 @@ describe("Notes API Resource", function() {
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
+          // expect(res.body.folderId).to.equal(data.folderId);
+          // expect(res.body.tags).to.equal(data.tags);
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
         });
