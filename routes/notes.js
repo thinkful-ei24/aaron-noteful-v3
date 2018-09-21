@@ -2,7 +2,7 @@
 
 const express = require("express");
 const Note = require("../models/note");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const router = express.Router();
 
@@ -10,19 +10,25 @@ const router = express.Router();
 router.get("/", (req, res, next) => {
   let searchTerm = req.query.searchTerm;
   let folderId = req.query.folderId;
+  let tagId = req.query.tagId;
   let filter = {};
+  let filter2 = {};
 
   if (searchTerm) {
-    const search = new RegExp(searchTerm, "i");
-    filter.title = { $regex: search };
+    filter.$text = { $search: searchTerm };
+    filter2.score = { $meta: "textScore" };
+    sort = filter2;
   }
   if (folderId) {
     filter.folderId = folderId;
   }
   if (tagId) {
-    filter.tagId = tagId;
+    filter.tags = tagId;
   }
-  Note.find(filter) 
+  Note.find(filter)
+    .select("title content created folderId tags")
+    .populate("tags")
+    .sort(sort)
     .then(results => {
       res.json(results);
     })
@@ -42,22 +48,17 @@ router.get("/:id", (req, res, next) => {
     filter.id = { _id: id };
   }
 
-  return Note.findById(filter.id, (err, user) => {
-    if (err) {
-      console.log("no id");
-    } else {
-      return user;
-    }
-  })
-
-    .then(results => {
-      res.json(results);
+  return Note.findById(filter.id)
+    .select("title content createdAt updatedAt folderId tags")
+    .populate("tags")
+    .then(result => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
     })
-
-    .catch(err => {
-      console.error(`ERROR: ${err.message}`);
-      console.error(err);
-    });
+    .catch(next);
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
@@ -66,11 +67,14 @@ router.post("/", (req, res, next) => {
     title: req.body.title,
     content: req.body.content,
     folderId: req.body.folderId,
-    tagId: req.body.tagId
+    tags: req.body.tags
   };
 
   if (!newObj.title || !newObj.content) {
     console.log("Must input Title and Content");
+    const err = new Error("Missing title or content in req body");
+    err.status = 400;
+    return next(err);
   }
 
   // if (!mongoose.Types.ObjectId.isValid(newObj.folderId)) {
@@ -80,7 +84,6 @@ router.post("/", (req, res, next) => {
   // }
 
   return Note.create(newObj)
-
     .then(results => {
       res.location(`${req.originalUrl}/${results.id}`);
       res.status(201).json(results);
@@ -99,10 +102,13 @@ router.put("/:id", (req, res, next) => {
   const newObj = {
     title: req.body.title,
     content: req.body.content,
-    folderId
+    folderId,
+    tags: req.body.tags
   };
 
   return Note.findByIdAndUpdate(id, newObj, { new: true })
+    .select("title content created folderId tags")
+    .populate("tags")
 
     .then(results => {
       res.json(results);
@@ -111,6 +117,7 @@ router.put("/:id", (req, res, next) => {
     .catch(err => {
       console.error(`ERROR: ${err.message}`);
       console.error(err);
+      next();
     });
 });
 
