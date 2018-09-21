@@ -12,13 +12,10 @@ router.get("/", (req, res, next) => {
   let folderId = req.query.folderId;
   let tagId = req.query.tagId;
   let filter = {};
-  let filter2 = {};
-  let sort;
 
   if (searchTerm) {
-    filter.$text = { $search: searchTerm };
-    filter2.score = { $meta: "textScore" };
-    sort = filter2;
+    const re = new RegExp(searchTerm, "i");
+    filter.$or = [{ title: {$regex: re} }, { content: {$regex: re}} ];
   }
   if (folderId) {
     filter.folderId = folderId;
@@ -29,7 +26,6 @@ router.get("/", (req, res, next) => {
   Note.find(filter)
     .select("title content created folderId tags")
     .populate("tags")
-    .sort(sort)
     .then(results => {
       res.json(results);
     })
