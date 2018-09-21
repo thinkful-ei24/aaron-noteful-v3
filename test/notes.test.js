@@ -78,6 +78,7 @@ describe("Notes API Resource", function() {
             "title",
             "content",
             "folderId",
+            "tags",
             "createdAt",
             "updatedAt"
           );
@@ -117,7 +118,8 @@ describe("Notes API Resource", function() {
               "title",
               "content",
               "createdAt",
-              "updatedAt"
+              "updatedAt",
+              "tags"
             );
             
             return Note.findById(res.body.id);
