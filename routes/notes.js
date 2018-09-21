@@ -13,6 +13,7 @@ router.get("/", (req, res, next) => {
   let tagId = req.query.tagId;
   let filter = {};
   let filter2 = {};
+  let sort;
 
   if (searchTerm) {
     filter.$text = { $search: searchTerm };
