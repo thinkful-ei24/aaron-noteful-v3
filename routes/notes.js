@@ -19,6 +19,9 @@ router.get("/", (req, res, next) => {
   if (folderId) {
     filter.folderId = folderId;
   }
+  if (tagId) {
+    filter.tagId = tagId;
+  }
   Note.find(filter) 
     .then(results => {
       res.json(results);
@@ -62,7 +65,8 @@ router.post("/", (req, res, next) => {
   const newObj = {
     title: req.body.title,
     content: req.body.content,
-    folderId: req.body.folderId
+    folderId: req.body.folderId,
+    tagId: req.body.tagId
   };
 
   if (!newObj.title || !newObj.content) {
