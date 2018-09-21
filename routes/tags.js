@@ -16,6 +16,7 @@ router.get("/", (req, res, next) => {
       .catch(err => {
         console.error(`ERROR: ${err.message}`);
         console.error(err);
+        next(err);
       });
   }
   if (!searchTerm) {
@@ -27,6 +28,7 @@ router.get("/", (req, res, next) => {
       .catch(err => {
         console.error(`ERROR: ${err.message}`);
         console.error(err);
+        next(err);
       });
   }
 });
