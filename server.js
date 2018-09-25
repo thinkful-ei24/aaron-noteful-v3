@@ -15,6 +15,7 @@ const foldersRouter = require('./routes/folders');
 const tagsRouter = require('./routes/tags');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
+require('dotenv').config;
 
 // Create an Express application
 const app = express();
