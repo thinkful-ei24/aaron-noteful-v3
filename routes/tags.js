@@ -2,8 +2,11 @@ const express = require("express");
 const Tag = require("../models/tags");
 const Note = require("../models/note");
 const mongoose = require("mongoose");
+const passport = require('passport');
 
 const router = express.Router();
+
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
 router.get("/", (req, res, next) => {
   let searchTerm = req.query.searchTerm;

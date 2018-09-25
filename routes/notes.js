@@ -3,10 +3,14 @@
 const express = require("express");
 const Note = require("../models/note");
 const mongoose = require("mongoose");
+const passport = require('passport');
 
 const router = express.Router();
 
 /* ========== GET/READ ALL ITEMS ========== */
+
+router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
+
 router.get("/", (req, res, next) => {
   let searchTerm = req.query.searchTerm;
   let folderId = req.query.folderId;
