@@ -10,8 +10,9 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 router.get("/", (req, res, next) => {
   let searchTerm = req.query.searchTerm;
+  let userId = req.user.id;
   if (searchTerm) {
-    return Folder.find({ name: { $regex: searchTerm, $options: "i" } })
+    return Folder.find({userId, name: { $regex: searchTerm, $options: "i" } })
       .sort("name")
       .then(results => {
         res.json(results);
@@ -22,7 +23,7 @@ router.get("/", (req, res, next) => {
       });
   }
   if (!searchTerm) {
-    return Folder.find()
+    return Folder.find({ userId })
       .sort("name")
       .then(results => {
         res.json(results);
@@ -36,12 +37,13 @@ router.get("/", (req, res, next) => {
 
 router.get("/:id", (req, res, next) => {
   let id = req.params.id;
+  let userId = req.user.id;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error("The `id` is not valid");
     err.status = 400;
     return next(err);
   }
-  Folder.findById(id)
+  Folder.findOne({_id: id, userId })
     .then(results => {
       if (results) {
         res.json(results);
@@ -56,7 +58,8 @@ router.get("/:id", (req, res, next) => {
 
 router.post("/", (req, res, next) => {
   const newObj = {
-    name: req.body.name
+    name: req.body.name,
+    userId: req.user.id
   };
   if (!newObj.name) {
     const err = new Error('Missing `name` in req body');
@@ -79,6 +82,7 @@ router.post("/", (req, res, next) => {
 
 router.put("/:id", (req, res, next) => {
   const id = req.params.id;
+  const userId = req.user.id;
   const newObj = {
     name: req.body.name
   };
@@ -92,7 +96,7 @@ router.put("/:id", (req, res, next) => {
       err.status = 400;
       return next(err);
   }
-  return Folder.findByIdAndUpdate(id, newObj, { new: true })
+  return Folder.findOneAndUpdate({ _id: id, userId }, newObj, { new: true })
     .then(results => {
       res.json(results);
     })
@@ -107,7 +111,8 @@ router.put("/:id", (req, res, next) => {
 
 router.delete("/:id", (req, res, next) => {
   const id = req.params.id;
-  return Folder.findByIdAndRemove(id)
+  const userId = req.user.id;
+  return Folder.findOneAndRemove({ _id: id, userId })
     .then(() => {
       res.status(204).end();
     })

@@ -15,7 +15,8 @@ router.get("/", (req, res, next) => {
   let searchTerm = req.query.searchTerm;
   let folderId = req.query.folderId;
   let tagId = req.query.tagId;
-  let filter = {};
+  const userId = req.user.id;
+  let filter = { userId };
 
   if (searchTerm) {
     const re = new RegExp(searchTerm, "i");
@@ -41,26 +42,24 @@ router.get("/", (req, res, next) => {
 /* ========== GET/READ A SINGLE ITEM ========== */
 router.get("/:id", (req, res, next) => {
   let id = req.params.id;
+  const userId = req.user.id;
   console.log(id);
 
-  let filter = {};
 
-  if (id) {
-    filter.id = { _id: id };
-  }
-
-  return Note.findById(filter.id)
-    .select("title content createdAt updatedAt folderId tags")
-    .populate("tags")
-    .then(result => {
-      if (result) {
-        res.json(result);
-      } else {
-        next();
-      }
-    })
-    .catch(next);
+  return Note.findOne({ _id: id, userId })
+  .populate('tags')
+  .then(result => {
+    if (result) {
+      res.json(result);
+    } else {
+      next();
+    }
+  })
+  .catch(err => {
+    next(err);
+  });
 });
+
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post("/", (req, res, next) => {
@@ -68,7 +67,8 @@ router.post("/", (req, res, next) => {
     title: req.body.title,
     content: req.body.content,
     folderId: req.body.folderId,
-    tags: req.body.tags
+    tags: req.body.tags,
+    userId: req.user.id
   };
 
   if (!newObj.title || !newObj.content) {
@@ -99,18 +99,19 @@ router.post("/", (req, res, next) => {
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put("/:id", (req, res, next) => {
   const id = req.params.id;
+  const userId = req.user.id;
   const folderId = req.body.folderId;
   const newObj = {
     title: req.body.title,
     content: req.body.content,
     folderId,
-    tags: req.body.tags
+    tags: req.body.tags,
+    userId: req.user.id
   };
 
-  return Note.findByIdAndUpdate(id, newObj, { new: true })
-    .select("title content created folderId tags")
+  return Note.findOneAndUpdate({ _id: id, userId }, newObj, { new: true })
+    .select("title content created folderId tags userId")
     .populate("tags")
-
     .then(results => {
       res.json(results);
     })
@@ -125,10 +126,11 @@ router.put("/:id", (req, res, next) => {
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete("/:id", (req, res, next) => {
   const id = req.params.id;
+  const userId = req.user.id;
 
-  return Note.findByIdAndRemove(id)
+  return Note.findOneAndRemove({ _id: id, userId })
 
-    .then(results => {
+    .then(() => {
       res.status(204).end();
     })
 
