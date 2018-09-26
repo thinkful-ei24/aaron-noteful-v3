@@ -5,8 +5,7 @@ const folderSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
 });
 
-folderSchema.index(
-  { name: 1, userId: 1 }, { unique: true });
+folderSchema.index({ name: 1, userId: 1 }, { unique: true });
 
 folderSchema.set("timestamps", true);
 
