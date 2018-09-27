@@ -11,7 +11,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe.only("Noteful API - Users", function() {
+describe("Noteful API - Users", function() {
   let username = "exampleUser";
   let password = "examplePass";
   let fullName = "Example User";
@@ -86,6 +86,7 @@ describe.only("Noteful API - Users", function() {
           .send(testUser)
           .then(res => {
             expect(res).to.have.status(422);
+            expect(res.body.location).to.equal('password')
           });
       });
       it("Should reject users with non-string username", function() {
